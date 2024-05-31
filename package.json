@@ -10,10 +10,11 @@
     "test": "jest"
   },
   "dependencies": {
-    "@realm/react": "^0.6.1",
+    "@realm/react": "^0.6.2",
+    "pods": "^2.0.0",
     "react": "18.2.0",
     "react-native": "0.72.6",
-    "realm": "^12.2.1"
+    "realm": "^12.9.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

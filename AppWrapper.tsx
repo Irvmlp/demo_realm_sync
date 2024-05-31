@@ -5,7 +5,7 @@ import RealmWrapper from './RealmWrapper';
 function AppWrapper(): JSX.Element {
   return (
     // IMPORTANT: ADD YOUR APP ID BELOW
-    <AppProvider id={'APP_ID_HERE'}>
+    <AppProvider id={'application-0-jojlosy'}>
       <UserProvider fallback={<RealmWrapper />}>
         <RealmWrapper />
       </UserProvider>
