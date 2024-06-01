@@ -2,7 +2,6 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {FlatList, Text, TouchableOpacity, View, StyleSheet, Alert, Modal, TextInput, Button} from 'react-native';
 import {RealmContext, Task} from './models/Task';
 import {BSON} from 'realm';
-import TaskContainer from './TaskContainer';
 
 const {useQuery, useRealm} = RealmContext;
 
@@ -10,9 +9,13 @@ function App(): JSX.Element {
   const realm = useRealm();
   const tasks = useQuery(Task);
 
-  const [modalVisible, setModalVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [addModalVisible, setAddModalVisible] = useState(false);
   const [currentTaskId, setCurrentTaskId] = useState(null);
   const [newDuration, setNewDuration] = useState('');
+  const [newTitle, setNewTitle] = useState('');
+  const [newDescription, setNewDescription] = useState('');
+  const [newTaskDuration, setNewTaskDuration] = useState('');
 
   const addSleep = useCallback(() => {
     realm.write(() => {
@@ -24,38 +27,6 @@ function App(): JSX.Element {
       });
     });
   }, [realm]);
-  const addYoga = useCallback(() => {
-    realm.write(() => {
-      realm.create('Task', {
-        _id: new BSON.ObjectId(),
-        title: '🧘', // Emoji for yoga
-        description: 'Yoga',
-        duration: 1, // Example duration in hours
-      });
-    });
-  }, [realm]);
-  
-  const addRunning = useCallback(() => {
-    realm.write(() => {
-      realm.create('Task', {
-        _id: new BSON.ObjectId(),
-        title: '🏃', // Emoji for running
-        description: 'Running',
-        duration: 1, // Example duration in hours
-      });
-    });
-  }, [realm]);
-  
-  const addReading = useCallback(() => {
-    realm.write(() => {
-      realm.create('Task', {
-        _id: new BSON.ObjectId(),
-        title: '📚', // Emoji for book
-        description: 'Reading',
-        duration: 1, // Example duration in hours
-      });
-    });
-  }, [realm]);
 
   const addHygiene = useCallback(() => {
     realm.write(() => {
@@ -63,7 +34,7 @@ function App(): JSX.Element {
         _id: new BSON.ObjectId(),
         title: '🧼',
         description: 'Hygiene',
-        duration: 1, // Example duration in hours
+        duration: 0.5, // Example duration in hours
       });
     });
   }, [realm]);
@@ -79,8 +50,32 @@ function App(): JSX.Element {
 
   const showEditModal = (taskId) => {
     setCurrentTaskId(taskId);
-    setModalVisible(true);
+    setEditModalVisible(true);
   };
+
+  const showAddModal = () => {
+    setAddModalVisible(true);
+  };
+
+  const addTask = useCallback(() => {
+    const duration = parseFloat(newTaskDuration);
+    if (newTitle && newDescription && !isNaN(duration) && duration > 0) {
+      realm.write(() => {
+        realm.create('Task', {
+          _id: new BSON.ObjectId(),
+          title: newTitle,
+          description: newDescription,
+          duration: duration,
+        });
+      });
+      setAddModalVisible(false);
+      setNewTitle('');
+      setNewDescription('');
+      setNewTaskDuration('');
+    } else {
+      Alert.alert("Invalid Input", "Please fill all fields with valid data.");
+    }
+  }, [realm, newTitle, newDescription, newTaskDuration]);
 
   const editTask = useCallback(() => {
     const duration = parseFloat(newDuration);
@@ -91,7 +86,7 @@ function App(): JSX.Element {
           taskToEdit.duration = duration;
         }
       });
-      setModalVisible(false);
+      setEditModalVisible(false);
       setNewDuration('');
     } else {
       Alert.alert("Invalid Input", "Please enter a valid number for the duration.");
@@ -106,14 +101,10 @@ function App(): JSX.Element {
 
   return (
     <View style={styles.Container}>
-      {/* <View> 
-        <TaskContainer/>  
-      </View> */}
       <View style={styles.AppHeadrTitle}>
         <Text style={styles.AppHeadText}>
           The Today App
         </Text>
-        
       </View>
       <View style={styles.masterTaskContainter}>
         <View style={styles.TaskContainter}>
@@ -123,19 +114,12 @@ function App(): JSX.Element {
           <TouchableOpacity style={styles.IndividualTaskContainter} onPress={addHygiene}>
             <Text style={styles.TaskEmoji}>{'🧼'}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.IndividualTaskContainter} onPress={addYoga}>
-          <Text style={styles.TaskEmoji}>{'🧘'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.IndividualTaskContainter} onPress={addRunning}>
-            <Text style={styles.TaskEmoji}>{'🏃'}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.IndividualTaskContainter} onPress={addReading}>
-            <Text style={styles.TaskEmoji}>{'📚'}</Text>
+          <TouchableOpacity style={styles.IndividualTaskContainter} onPress={showAddModal}>
+            <Text style={styles.TaskEmoji}>{'➕'}</Text>
           </TouchableOpacity>
         </View>
       </View>
-    
+
       <View style={styles.FinishedItemsTitle}>
         <Text style={styles.FinishedItemsTitleText}>
           Logged Items 
@@ -159,10 +143,10 @@ function App(): JSX.Element {
       </View>
 
       <Modal
-        visible={modalVisible}
+        visible={editModalVisible}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setModalVisible(false)}
+        onRequestClose={() => setEditModalVisible(false)}
       >
         <View style={styles.ModalContainer}>
           <View style={styles.ModalContent}>
@@ -175,12 +159,45 @@ function App(): JSX.Element {
               onChangeText={setNewDuration}
             />
             <Button title="Save" onPress={editTask} />
-            <Button title="Cancel" onPress={() => setModalVisible(false)} />
+            <Button title="Cancel" onPress={() => setEditModalVisible(false)} />
           </View>
         </View>
       </Modal>
-      
-       </View>
+
+      <Modal
+        visible={addModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setAddModalVisible(false)}
+      >
+        <View style={styles.ModalContainer}>
+          <View style={styles.ModalContent}>
+            <Text style={styles.ModalTitle}>Add New Task</Text>
+            <TextInput
+              style={styles.Input}
+              placeholder="Enter title"
+              value={newTitle}
+              onChangeText={setNewTitle}
+            />
+            <TextInput
+              style={styles.Input}
+              placeholder="Enter description"
+              value={newDescription}
+              onChangeText={setNewDescription}
+            />
+            <TextInput
+              style={styles.Input}
+              placeholder="Enter duration in hours"
+              keyboardType="numeric"
+              value={newTaskDuration}
+              onChangeText={setNewTaskDuration}
+            />
+            <Button title="Add Task" onPress={addTask} />
+            <Button title="Cancel" onPress={() => setAddModalVisible(false)} />
+          </View>
+        </View>
+      </Modal>
+    </View>
   );
 }
 

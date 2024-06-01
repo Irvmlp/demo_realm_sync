@@ -2,7 +2,6 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {FlatList, Text, TouchableOpacity, View, StyleSheet, Alert, Modal, TextInput, Button} from 'react-native';
 import {RealmContext, Task} from './models/Task';
 import {BSON} from 'realm';
-import TaskContainer from './TaskContainer';
 
 const {useQuery, useRealm} = RealmContext;
 
@@ -24,38 +23,6 @@ function App(): JSX.Element {
       });
     });
   }, [realm]);
-  const addYoga = useCallback(() => {
-    realm.write(() => {
-      realm.create('Task', {
-        _id: new BSON.ObjectId(),
-        title: '🧘', // Emoji for yoga
-        description: 'Yoga',
-        duration: 1, // Example duration in hours
-      });
-    });
-  }, [realm]);
-  
-  const addRunning = useCallback(() => {
-    realm.write(() => {
-      realm.create('Task', {
-        _id: new BSON.ObjectId(),
-        title: '🏃', // Emoji for running
-        description: 'Running',
-        duration: 1, // Example duration in hours
-      });
-    });
-  }, [realm]);
-  
-  const addReading = useCallback(() => {
-    realm.write(() => {
-      realm.create('Task', {
-        _id: new BSON.ObjectId(),
-        title: '📚', // Emoji for book
-        description: 'Reading',
-        duration: 1, // Example duration in hours
-      });
-    });
-  }, [realm]);
 
   const addHygiene = useCallback(() => {
     realm.write(() => {
@@ -63,7 +30,7 @@ function App(): JSX.Element {
         _id: new BSON.ObjectId(),
         title: '🧼',
         description: 'Hygiene',
-        duration: 1, // Example duration in hours
+        duration: 0.5, // Example duration in hours
       });
     });
   }, [realm]);
@@ -106,14 +73,10 @@ function App(): JSX.Element {
 
   return (
     <View style={styles.Container}>
-      {/* <View> 
-        <TaskContainer/>  
-      </View> */}
       <View style={styles.AppHeadrTitle}>
         <Text style={styles.AppHeadText}>
           The Today App
         </Text>
-        
       </View>
       <View style={styles.masterTaskContainter}>
         <View style={styles.TaskContainter}>
@@ -123,19 +86,12 @@ function App(): JSX.Element {
           <TouchableOpacity style={styles.IndividualTaskContainter} onPress={addHygiene}>
             <Text style={styles.TaskEmoji}>{'🧼'}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.IndividualTaskContainter} onPress={addYoga}>
-          <Text style={styles.TaskEmoji}>{'🧘'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.IndividualTaskContainter} onPress={addRunning}>
-            <Text style={styles.TaskEmoji}>{'🏃'}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.IndividualTaskContainter} onPress={addReading}>
-            <Text style={styles.TaskEmoji}>{'📚'}</Text>
+          <TouchableOpacity style={styles.IndividualTaskContainter} >
+            <Text style={styles.TaskEmoji}>{'➕'}</Text>
           </TouchableOpacity>
         </View>
       </View>
-    
+
       <View style={styles.FinishedItemsTitle}>
         <Text style={styles.FinishedItemsTitleText}>
           Logged Items 
@@ -179,8 +135,7 @@ function App(): JSX.Element {
           </View>
         </View>
       </Modal>
-      
-       </View>
+    </View>
   );
 }
 

@@ -2,11 +2,10 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {FlatList, Text, TouchableOpacity, View, StyleSheet, Alert, Modal, TextInput, Button} from 'react-native';
 import {RealmContext, Task} from './models/Task';
 import {BSON} from 'realm';
-import TaskContainer from './TaskContainer';
 
 const {useQuery, useRealm} = RealmContext;
 
-function App(): JSX.Element {
+function TaskContainer(): JSX.Element {
   const realm = useRealm();
   const tasks = useQuery(Task);
 
@@ -21,38 +20,6 @@ function App(): JSX.Element {
         title: '💤',
         description: 'Sleep',
         duration: 8, // Example duration in hours
-      });
-    });
-  }, [realm]);
-  const addYoga = useCallback(() => {
-    realm.write(() => {
-      realm.create('Task', {
-        _id: new BSON.ObjectId(),
-        title: '🧘', // Emoji for yoga
-        description: 'Yoga',
-        duration: 1, // Example duration in hours
-      });
-    });
-  }, [realm]);
-  
-  const addRunning = useCallback(() => {
-    realm.write(() => {
-      realm.create('Task', {
-        _id: new BSON.ObjectId(),
-        title: '🏃', // Emoji for running
-        description: 'Running',
-        duration: 1, // Example duration in hours
-      });
-    });
-  }, [realm]);
-  
-  const addReading = useCallback(() => {
-    realm.write(() => {
-      realm.create('Task', {
-        _id: new BSON.ObjectId(),
-        title: '📚', // Emoji for book
-        description: 'Reading',
-        duration: 1, // Example duration in hours
       });
     });
   }, [realm]);
@@ -106,36 +73,22 @@ function App(): JSX.Element {
 
   return (
     <View style={styles.Container}>
-      {/* <View> 
-        <TaskContainer/>  
-      </View> */}
       <View style={styles.AppHeadrTitle}>
         <Text style={styles.AppHeadText}>
-          The Today App
+          Current
         </Text>
-        
       </View>
       <View style={styles.masterTaskContainter}>
         <View style={styles.TaskContainter}>
           <TouchableOpacity style={styles.IndividualTaskContainter} onPress={addSleep}>
-            <Text style={styles.TaskEmoji}>{'💤'}</Text>
+            <Text style={styles.TaskEmoji}>{'+'}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.IndividualTaskContainter} onPress={addHygiene}>
             <Text style={styles.TaskEmoji}>{'🧼'}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.IndividualTaskContainter} onPress={addYoga}>
-          <Text style={styles.TaskEmoji}>{'🧘'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.IndividualTaskContainter} onPress={addRunning}>
-            <Text style={styles.TaskEmoji}>{'🏃'}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.IndividualTaskContainter} onPress={addReading}>
-            <Text style={styles.TaskEmoji}>{'📚'}</Text>
-          </TouchableOpacity>
         </View>
       </View>
-    
+      
       <View style={styles.FinishedItemsTitle}>
         <Text style={styles.FinishedItemsTitleText}>
           Logged Items 
@@ -180,118 +133,12 @@ function App(): JSX.Element {
         </View>
       </Modal>
       
-       </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  AppHeadrTitle: {
-    margin: 30,
-  },
-  AppHeadText: {
-    fontSize: 24,
-    fontFamily: 'Opensans',
-  },
-  Container: {
-    backgroundColor: '#F6F8FF',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  masterTaskContainter: {
-    marginTop: 10,
-    gap: 4,
-    flexDirection: 'row',
-  },
-  TaskContainter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 4,
-    gap: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  IndividualTaskContainter: {
-    backgroundColor: 'white',
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-  },
-  TaskEmoji: {
-    color: 'black',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  FinishedItemsTitle: {
-    margin: 30,
-  },
-  FinishedItemContainer: {
-    marginVertical: 12,
-  },
-  FinishedItemsTitleText: {
-    fontSize: 24,
-    fontFamily: 'Opensans',
-    alignItems: 'center',
-    textAlign: 'center',
-  },
-  FinishedItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    marginVertical: 4,
-    borderRadius: 5,
-  },
-  FinishedItemText: {
-    fontSize: 14,
-  },
-  DeleteButton: {
-    backgroundColor: 'red',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 5,
-  },
-  DeleteButtonText: {
-    color: 'white',
-    fontSize: 14,
-  },
-  EditButton: {
-    backgroundColor: 'blue',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 5,
-  },
-  EditButtonText: {
-    color: 'white',
-    fontSize: 14,
-  },
-  ModalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  ModalContent: {
-    width: 300,
-    padding: 20,
-    backgroundColor: 'white',
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  ModalTitle: {
-    fontSize: 18,
-    marginBottom: 10,
-  },
-  Input: {
-    width: '100%',
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    marginBottom: 10,
-  },
+  
 });
 
-export default App;
+export default TaskContainer;

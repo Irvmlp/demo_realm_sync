@@ -1,6 +1,8 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {FlatList, Text, TouchableOpacity, View, StyleSheet, Alert, Modal, TextInput, Button} from 'react-native';
 import {RealmContext, Task} from './models/Task';
+import {UserProfileContext, UserProfile} from './models/UserProfile';
+
 import {BSON} from 'realm';
 import TaskContainer from './TaskContainer';
 
@@ -21,38 +23,6 @@ function App(): JSX.Element {
         title: '💤',
         description: 'Sleep',
         duration: 8, // Example duration in hours
-      });
-    });
-  }, [realm]);
-  const addYoga = useCallback(() => {
-    realm.write(() => {
-      realm.create('Task', {
-        _id: new BSON.ObjectId(),
-        title: '🧘', // Emoji for yoga
-        description: 'Yoga',
-        duration: 1, // Example duration in hours
-      });
-    });
-  }, [realm]);
-  
-  const addRunning = useCallback(() => {
-    realm.write(() => {
-      realm.create('Task', {
-        _id: new BSON.ObjectId(),
-        title: '🏃', // Emoji for running
-        description: 'Running',
-        duration: 1, // Example duration in hours
-      });
-    });
-  }, [realm]);
-  
-  const addReading = useCallback(() => {
-    realm.write(() => {
-      realm.create('Task', {
-        _id: new BSON.ObjectId(),
-        title: '📚', // Emoji for book
-        description: 'Reading',
-        duration: 1, // Example duration in hours
       });
     });
   }, [realm]);
@@ -82,22 +52,6 @@ function App(): JSX.Element {
     setModalVisible(true);
   };
 
-  const editTask = useCallback(() => {
-    const duration = parseFloat(newDuration);
-    if (!isNaN(duration) && duration > 0) {
-      realm.write(() => {
-        const taskToEdit = realm.objectForPrimaryKey('Task', currentTaskId);
-        if (taskToEdit) {
-          taskToEdit.duration = duration;
-        }
-      });
-      setModalVisible(false);
-      setNewDuration('');
-    } else {
-      Alert.alert("Invalid Input", "Please enter a valid number for the duration.");
-    }
-  }, [realm, currentTaskId, newDuration]);
-
   useEffect(() => {
     realm.subscriptions.update(mutableSubs => {
       mutableSubs.add(realm.objects(Task));
@@ -106,39 +60,25 @@ function App(): JSX.Element {
 
   return (
     <View style={styles.Container}>
-      {/* <View> 
-        <TaskContainer/>  
-      </View> */}
       <View style={styles.AppHeadrTitle}>
         <Text style={styles.AppHeadText}>
-          The Today App
+          Tasks
         </Text>
-        
       </View>
       <View style={styles.masterTaskContainter}>
         <View style={styles.TaskContainter}>
-          <TouchableOpacity style={styles.IndividualTaskContainter} onPress={addSleep}>
-            <Text style={styles.TaskEmoji}>{'💤'}</Text>
-          </TouchableOpacity>
           <TouchableOpacity style={styles.IndividualTaskContainter} onPress={addHygiene}>
             <Text style={styles.TaskEmoji}>{'🧼'}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.IndividualTaskContainter} onPress={addYoga}>
-          <Text style={styles.TaskEmoji}>{'🧘'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.IndividualTaskContainter} onPress={addRunning}>
-            <Text style={styles.TaskEmoji}>{'🏃'}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.IndividualTaskContainter} onPress={addReading}>
-            <Text style={styles.TaskEmoji}>{'📚'}</Text>
+          <TouchableOpacity style={styles.IndividualTaskContainter} onPress={addSleep}>
+            <Text style={styles.TaskEmoji}>{'+'}</Text>
           </TouchableOpacity>
         </View>
       </View>
-    
+      
       <View style={styles.FinishedItemsTitle}>
         <Text style={styles.FinishedItemsTitleText}>
-          Logged Items 
+          All Items 
         </Text>
       </View>
       <View style={styles.FinishedItemContainer}>
@@ -147,9 +87,6 @@ function App(): JSX.Element {
           renderItem={({item}) => (
             <View style={styles.FinishedItem}>
               <Text style={styles.FinishedItemText}>{`${item.title} - ${item.description} (${item.duration} hrs)`}</Text>
-              <TouchableOpacity style={styles.EditButton} onPress={() => showEditModal(item._id)}>
-                <Text style={styles.EditButtonText}>Edit</Text>
-              </TouchableOpacity>
               <TouchableOpacity style={styles.DeleteButton} onPress={() => deleteTask(item._id)}>
                 <Text style={styles.DeleteButtonText}>Delete</Text>
               </TouchableOpacity>
@@ -158,29 +95,8 @@ function App(): JSX.Element {
         />
       </View>
 
-      <Modal
-        visible={modalVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.ModalContainer}>
-          <View style={styles.ModalContent}>
-            <Text style={styles.ModalTitle}>Edit Duration</Text>
-            <TextInput
-              style={styles.Input}
-              placeholder="Enter new duration in hours"
-              keyboardType="numeric"
-              value={newDuration}
-              onChangeText={setNewDuration}
-            />
-            <Button title="Save" onPress={editTask} />
-            <Button title="Cancel" onPress={() => setModalVisible(false)} />
-          </View>
-        </View>
-      </Modal>
       
-       </View>
+    </View>
   );
 }
 
